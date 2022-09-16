@@ -61,9 +61,6 @@ class Deck:
         self._iter_idx += 1
         return self.stack[self._iter_idx - 1]
 
-    def draw(self):
-        return self.stack.pop()
-
 
 class StandardDeck(Deck):
 

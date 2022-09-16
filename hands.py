@@ -1,7 +1,7 @@
 import typing
 import enum
 import itertools
-from card_objects import Card, Suit
+import card_objects
 
 
 class HandHierarchy(enum.IntEnum):
@@ -18,7 +18,7 @@ class HandHierarchy(enum.IntEnum):
 
 class HandDetector:
 
-    def find_pairs(self, hand: typing.List[Card]) -> typing.Dict:
+    def find_pairs(self, hand: typing.List[card_objects.Card]) -> typing.Dict:
         """
         Returns a dictionary sorting cards with equal values. For example, given these cards:
             2 of Hearts
@@ -47,7 +47,7 @@ class HandDetector:
             key: list(group) for key, group in itertools.groupby(hand, lambda x: x.value)
         }
 
-    def find_sequences(self, hand: typing.List[Card]) -> typing.Dict:
+    def find_sequences(self, hand: typing.List[card_objects.Card]) -> typing.Dict:
         """
         Returns a dictionary sorting cards into sequences. For example, given these cards:
             2 of Hearts
@@ -83,7 +83,7 @@ class HandDetector:
                 ret_dict[sequential_card_values][sequential_card_value] = pair_dict[sequential_card_value]
         return ret_dict
 
-    def find_suits(self, hand: typing.List[Card]):
+    def find_suits(self, hand: typing.List[card_objects.Card]):
         """
         Returns a dictionary sorting cards into suits. For example, given these cards:
             2 of Hearts
@@ -111,28 +111,12 @@ class HandDetector:
         }
 
 
+class Hand:
 
-
-
-
-
-c1 = Card(suit=Suit(name="test1", color="testcol1"), value=1, name="one")
-c2 = Card(suit=Suit(name="test2", color="testcol2"), value=2, name="two")
-c4 = Card(suit=Suit(name="test1", color="testcol4"), value=4, name="four")
-c5 = Card(suit=Suit(name="test2", color="testcol5"), value=5, name="five")
-c6 = Card(suit=Suit(name="test1", color="testcol6"), value=6, name="six")
-c7 = Card(suit=Suit(name="test2", color="testcol7"), value=7, name="seven")
-c8 = Card(suit=Suit(name="test3", color="testcol8"), value=8, name="eight")
-c9 = Card(suit=Suit(name="test4", color="testcol9"), value=1, name="one")
-c10 = Card(suit=Suit(name="test1", color="testcol10"), value=2, name="two")
-c11 = Card(suit=Suit(name="test2", color="testcol11"), value=4, name="four")
-c12 = Card(suit=Suit(name="test3", color="testcol12"), value=5, name="five")
-c13 = Card(suit=Suit(name="test4", color="testcol13"), value=6, name="six")
-c14 = Card(suit=Suit(name="test5", color="testcol14"), value=7, name="seven")
-c15 = Card(suit=Suit(name="test1", color="testcol15"), value=8, name="eight")
-c16 = Card(suit=Suit(name="test1", color="testcol15"), value=12, name="eight")
-
-
-hd = HandDetector()
-straight_dict = hd.find_suits(hand=[c1, c2, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16])
-pass
+    def __init__(
+            self,
+            max_size: int,
+            cards: typing.List[card_objects.Card] = None
+    ):
+        self.max_size = max_size
+        self.cards = cards or []
