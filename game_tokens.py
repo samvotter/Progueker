@@ -1,7 +1,7 @@
 import dataclasses
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(order=True)
 class Chip:
     """
     A Chip's single responsibility is to represent money. Chips may come in any denomination and chips can be exchanged
