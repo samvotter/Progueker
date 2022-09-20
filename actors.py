@@ -7,17 +7,30 @@ import hands
 
 class Player:
     """
-    The Player's single responsibility is to play the game.
+    The Player's single responsibility is to represent a player at the table.
     """
     def __init__(
             self,
             name: str,
-            chips: typing.List[game_tokens.Chip],
-            hand: hands.Hand,
+            chips: typing.List[game_tokens.Chip] = None,
+            hand: hands.Hand = None,
     ):
         self.name = name
-        self.chips = chips
-        self.hand = hand
+        self.chips = chips or []
+        self.hand = hand or []
+        self.bid = []
+
+    def __str__(self):
+        return f"{self.name}:\n" \
+               f"\tChips: {sum(chip.value for chip in self.chips)}"
+
+
+class DealerExceptions(Exception):
+    pass
+
+
+class RanOutOfCards(DealerExceptions):
+    pass
 
 
 class Dealer:
@@ -31,17 +44,26 @@ class Dealer:
     ):
         self.deck = deck
 
-    def shuffle(self, cards: typing.List[card_objects.Card] = None):
+    def shuffle(self, cards: typing.List[card_objects.Card] = None) -> None:
         if cards is None:
             cards = self.deck
         random.shuffle(cards)
 
-    def draw_from_deck(self, deck: card_objects.Deck = None):
+    def draw_from_deck(self, deck: card_objects.Deck = None) -> card_objects.Card:
         if deck is None:
             deck = self.deck
-        return deck.stack.pop()
+        if deck:
+            return deck.stack.pop()
+        raise RanOutOfCards(f"Cannot draw from deck, there are no more cards.")
 
-    def deal_hands(self, hands_to_be_dealt: typing.List[hands.Hand], deck: card_objects.Deck = None):
+    def deal_hands(self, hands_to_be_dealt: typing.List[hands.Hand], deck: card_objects.Deck = None) -> None:
+        """
+        :param hands_to_be_dealt: A list of cards. Only hands which need to be dealt more cards should ever be passed
+        into this function. If a hand does not need to be dealt cards, it does not belong in a list called:
+            "hands to be dealt"
+        :param deck: Where the cards being dealt are coming from.
+        :return: None. Modifies the state of the passed in hands of cards.
+        """
         if deck is None:
             deck = self.deck
         while hands_to_be_dealt:
@@ -81,7 +103,7 @@ class BankDoesNotHaveEnough(BankerExceptions):
 
 class Banker:
     """
-    The Banker's single responsibility is to exchange chips for other chips.
+    The Banker's single responsibility is to manage interactions with the chip supply.
     """
 
     def __init__(
@@ -90,14 +112,25 @@ class Banker:
     ):
         self.chips = chips
 
-    def exchange_chips(self, tray: typing.List[game_tokens.Chip], requesting: game_tokens.Chip):
+    def take_chips(self, tray: typing.List[game_tokens.Chip]) -> None:
         """
-        Exchanges one set of chips for another set of equal value.
+        Incorporate a tray of chips into the chip supply.
+
+        :param tray: tray represents a physical container which is passed between the banker and a requestor.
+            The contents of the tray are replaced with an equal value of the chips requested.
+        :return: None, modifies the contents of the passed in tray
+        """
+        while tray:
+            self.chips.append(tray.pop())
+
+    def exchange_chips(self, tray: typing.List[game_tokens.Chip], requesting: game_tokens.Chip) -> None:
+        """
+        Exchanges one set of chips for another set of equal value. Must be exact change.
 
         :param tray: tray represents a physical container which is passed between the banker and a requestor.
             The contents of the tray are replaced with an equal value of the chips requested.
         :param requesting: The desired chips to be returned
-        :return: typing.List[game_tokens.Chip]
+        :return: None, modifies the contents of the passed in tray
         """
         # how much did they give you?
         total_value = sum(chip.value for chip in tray)
@@ -121,22 +154,8 @@ class Banker:
             )
 
         # Take their chips
-        while tray:
-            self.chips.append(tray.pop())
+        self.take_chips(tray)
 
         # Give them chips
         for chip in range(chips_needed):
             tray.append(self.chips.pop(self.chips.index(requesting)))
-
-
-fives = [game_tokens.Chip(value=5, color="white") for i in range(10)]
-twentyfives = [game_tokens.Chip(value=25, color="white") for j in range(10)]
-
-test_chips = fives + twentyfives
-
-b = Banker(chips=test_chips)
-
-my_tray = [game_tokens.Chip(value=-1, color="white")]
-
-b.exchange_chips(tray=my_tray, requesting=game_tokens.Chip(value=25, color="white"))
-pass
