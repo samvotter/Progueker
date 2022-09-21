@@ -4,13 +4,11 @@ import typing
 
 class Interface(abc.ABC):
     """
-    The Interfaces's single responsibility is to present a mode of interaction for the application user.
+    The Interface's single responsibility is to present a mode of interaction for the application user.
     """
 
     def __init__(self, resolution: typing.Tuple[int, int]):
-        self.width = resolution[0]
-        self.height = resolution[1]
-
+        self.width, self.height = resolution
 
     @abc.abstractmethod
     def generate_display(self):
@@ -25,6 +23,16 @@ class Interface(abc.ABC):
         Exits the program
         """
         pass
+
+    def resize(self, resolution: typing.Tuple[int, int]):
+        """
+        Change resolution of interface display.
+        :return:
+        """
+        pass
+
+
+
 
 
 
