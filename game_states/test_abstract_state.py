@@ -58,11 +58,3 @@ class TestMachine(StateMachine):
     def __init__(self, state: State):
         super().__init__(state=state)
 
-
-my_machine = TestMachine(A())
-
-while not isinstance(my_machine.state, TerminalState):
-    print(f"{my_machine.state} -> ", end="")
-    choice = random.choice(list(my_machine.state.transitions.keys()))
-    my_machine.new_state(choice)
-    print(my_machine.state)

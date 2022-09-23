@@ -1,3 +1,5 @@
+import abc
+
 import card_objects
 import game_tokens
 import random
@@ -5,7 +7,7 @@ import typing
 import hands
 
 
-class Player:
+class Player(abc.ABC):
     """
     The Player's single responsibility is to represent a player at the table.
     """
@@ -19,6 +21,10 @@ class Player:
         self.chips = chips or []
         self.hand = hand or []
         self.bid = []
+
+    def _all_in(self):
+        while self.chips:
+            self.bid.append(self.chips.pop())
 
     def __str__(self):
         return f"{self.name}:\n" \
@@ -85,32 +91,37 @@ class BankerExceptions(Exception):
 
 class NotExactChange(BankerExceptions):
 
-    def __init__(self, msg: str, chips_needed: int, remaining: int):
-        self.msg = msg
-        self.chips_needed = chips_needed
-        self.remaining = remaining
-        super().__init__(msg)
+    def __init__(self, requested_amount: int, chip_value: int):
+        self.requested = requested_amount
+        self.chip_value = chip_value
+
+    def __str__(self):
+        return f"Cannot make exact change with the tray provided!\n" \
+               f"\tThe given amount: {self.requested} is not divisible by: {self.chip_value}\n"
 
 
 class BankDoesNotHaveEnough(BankerExceptions):
 
-    def __init__(self, msg: str, chips_available: int, chips_needed: int):
-        self.msg = msg
+    def __init__(self, chips_available: int, chips_needed: int):
         self.chips_available = chips_available,
         self.chips_needed = chips_needed
-        super().__init__(msg)
+
+    def __str__(self):
+        return f"Not enough Chips are available in the bank to make the exchange!\n" \
+               f"\tChips Needed: {self.chips_needed}\n" \
+               f"\tChips Available: {self.chips_available}\n"
 
 
 class Banker:
     """
-    The Banker's single responsibility is to manage interactions with the chip supply.
+    The Banker's single responsibility is to manage interactions with chips outside of player counts.
     """
 
     def __init__(
             self,
-            chips: typing.List[game_tokens.Chip]
+            chips: typing.List[game_tokens.Chip] = None
     ):
-        self.chips = chips
+        self.chips = chips or []
 
     def take_chips(self, tray: typing.List[game_tokens.Chip]) -> None:
         """
@@ -138,20 +149,12 @@ class Banker:
         # how much do they need back?
         chips_needed, remaining = divmod(total_value, requesting.value)
         if remaining:
-            raise NotExactChange(
-                f"Cannot make exact change with the tray provided!",
-                chips_needed=chips_needed,
-                remaining=remaining
-            )
+            raise NotExactChange(requested_amount=total_value, chip_value=requesting.value)
 
         # Do you have what they need?
         chips_available = self.chips.count(requesting)
         if chips_available < chips_needed:
-            raise BankDoesNotHaveEnough(
-                f"Not enough Chips are available in the bank to make the exchange!",
-                chips_available=chips_available,
-                chips_needed=chips_needed
-            )
+            raise BankDoesNotHaveEnough(chips_available=chips_available, chips_needed=chips_needed)
 
         # Take their chips
         self.take_chips(tray)

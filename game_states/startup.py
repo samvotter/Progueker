@@ -13,10 +13,12 @@ class PokerSetup:
             self,
             players: typing.List[actors.Player],
             chips: typing.List[game_tokens.Chip],
+            minimum_bid: int = 0,
             deck: card_objects.Deck = None,
     ):
         self.players = players
         self.banker = actors.Banker(chips=chips)
+        self.minimum_bid = minimum_bid
         deck = deck or card_objects.StandardDeck()
         self.dealer = actors.Dealer(deck=deck)
 

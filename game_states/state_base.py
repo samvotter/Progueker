@@ -3,7 +3,7 @@ import typing
 
 class State:
     """
-    A State's single responsibility is to organize information relevant to that state.
+    A State's single responsibility is to provide transitions into other states.
     """
 
     def __init__(self, transitions: typing.Dict[typing.Any, typing.Any]):
