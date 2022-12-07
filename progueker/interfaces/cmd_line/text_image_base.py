@@ -17,14 +17,25 @@ class TextImage(abc.ABC):
         pass
 
     @staticmethod
-    def center_align(width: int, text: str, pad: str = " ") -> str:
-        text_size = len(text)
-        if text_size > width:
-            raise ValueError(f"Text is too big, it does not need to be center-aligned")
-        padding_needed = width - text_size
-        side, remainder = divmod(padding_needed, 2)
-        return f"{pad * side}{pad * remainder}{text}{pad * side}\n"
+    def left_align(width: int, text: str, pad: str = " ") -> str:
+        while len(text) > width:
+            yield text[:width]
+            text = text[width:]
+        yield f"{text}{pad * (width - len(text))}"
 
     @staticmethod
-    def str_wrap(width: int, text: str, wrap: str = "=") -> str:
-        return f"{wrap * width}\n{text}{wrap * width}\n"
+    def center_align(width: int, text: str, pad: str = " ") -> str:
+        while len(text) > width:
+            yield text[:width]
+            text = text[width:]
+        padding_needed = width - len(text)
+        side, remainder = divmod(padding_needed, 2)
+        yield f"{pad * side}{pad * remainder}{text}{pad * side}"
+
+    @staticmethod
+    def right_align(width: int, text: str, pad: str = " ") -> str:
+        while len(text) > width:
+            yield text[:width]
+            text = text[width:]
+        yield f"{pad * (width - len(text))}{text}"
+

@@ -1,36 +1,29 @@
 import typing
-import game_tokens
-import actors
-import abc
-import hand_logic
-from game.betting import BettingActions
 import random
 
+from progueker.players.player import Player
+from progueker.game_tokens.cards import Card
+from progueker.game_tokens.chips import Chip
+from progueker.players.betting_signals import BettingSignals
 
-class AIPlayer(actors.Player):
+
+class RandomAIPlayer(Player):
 
     def __init__(
             self,
             name: str,
-            chips: typing.List[game_tokens.Chip] = None,
-            hand: hands.Hand = None
+            chips: typing.List[Chip] = None,
+            hand: typing.List[Card] = None
     ):
-        super().__init__(name=name, chips=chips, hand=hand)
+        self.name = name
+        self.chips = chips or []
+        self.hand = hand or []
 
-    @abc.abstractmethod
-    def make_bid_choice(self, bid: typing.List[game_tokens.Chip]) -> BettingActions:
-        """
-        Contains the logic used to determine how the choice is made.
-        """
-        pass
+    def fold(self):
+        return BettingSignals.FOLD
 
-    @abc.abstractmethod
-    def _call_bid(self, bid: typing.List[game_tokens.Chip]) -> BettingActions:
-        pass
 
-    @abc.abstractmethod
-    def _raise_bid(self, bid: typing.List[game_tokens.Chip]) -> BettingActions:
-        pass
+
 
 
 class RandomAIPlayer(AIPlayer):

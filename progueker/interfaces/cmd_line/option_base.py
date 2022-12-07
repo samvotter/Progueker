@@ -26,28 +26,8 @@ class StandardOption(Option):
     matching_symbol: str
 
     def generate_image(self, resolution: typing.Tuple[int, int]) -> str:
-        return f"{self.name}: <{self.get_matching_symbol()}>"
+        width, height = resolution
+        return "".join(line for line in self.left_align(width=width, text=f"{self.name}: <{self.matching_symbol}>"))
 
     def get_matching_symbol(self) -> str:
         return self.matching_symbol
-
-
-class OptionMenu(list):
-
-    """
-    An OptionMenu's single responsibility is to represent a collection of possible actions to the application user
-    """
-
-    def __init__(self, options: typing.List[Option]):
-        super().__init__(options)
-
-    def get_options_str(self, resolution: typing.Tuple[int, int]) -> str:
-        for idx, option in enumerate(self):
-            yield f"{idx}. {option.generate_image(resolution)}>\n"
-
-    def get_matching_symbols(self) -> set:
-        option_symbols = set(option.get_matching_symbol() for option in self)
-        if len(option_symbols) < len(self):
-            raise ValueError(f"Options contain duplicate matching symbols. {self}")
-        return option_symbols
-
