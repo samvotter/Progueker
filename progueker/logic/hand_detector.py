@@ -1,10 +1,11 @@
 import typing
-import enum
 import itertools
-import card_objects
+
+from progueker.game_tokens.cards import Card
+from progueker.utils import EnumDict
 
 
-class HandHierarchy(enum.IntEnum):
+class HandHierarchy(EnumDict):
     HIGH_CARD       = 1
     TWO_OF_A_KIND   = 2
     TWO_PAIR        = 3
@@ -18,7 +19,7 @@ class HandHierarchy(enum.IntEnum):
 
 class HandDetector:
 
-    def find_pairs(self, hand: typing.List[card_objects.Card]) -> typing.Dict:
+    def find_pairs(self, hand: typing.List[Card]) -> typing.Dict:
         """
         Returns a dictionary sorting cards with equal values. For example, given these cards:
             2 of Hearts
@@ -47,7 +48,7 @@ class HandDetector:
             key: list(group) for key, group in itertools.groupby(hand, lambda x: x.value)
         }
 
-    def find_sequences(self, hand: typing.List[card_objects.Card]) -> typing.Dict:
+    def find_sequences(self, hand: typing.List[Card]) -> typing.Dict:
         """
         Returns a dictionary sorting cards into sequences. For example, given these cards:
             2 of Hearts
@@ -83,7 +84,7 @@ class HandDetector:
                 ret_dict[sequential_card_values][sequential_card_value] = pair_dict[sequential_card_value]
         return ret_dict
 
-    def find_suits(self, hand: typing.List[card_objects.Card]):
+    def find_suits(self, hand: typing.List[Card]):
         """
         Returns a dictionary sorting cards into suits. For example, given these cards:
             2 of Hearts
@@ -109,14 +110,3 @@ class HandDetector:
         return {
             key: list(group) for key, group in itertools.groupby(hand, lambda x: x.suit.name)
         }
-
-
-class Hand:
-
-    def __init__(
-            self,
-            max_size: int,
-            cards: typing.List[card_objects.Card] = None
-    ):
-        self.max_size = max_size
-        self.cards = cards or []

@@ -1,4 +1,4 @@
-from game_states.state_base import State, TerminalState, StateMachine
+from progueker.game_states.state_base import State
 import enum
 import typing
 

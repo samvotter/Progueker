@@ -1,6 +1,4 @@
-import actors
-import game_tokens
-import card_objects
+from progueker import card_objects, game_tokens, actors
 import typing
 
 

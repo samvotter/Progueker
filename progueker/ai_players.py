@@ -2,7 +2,7 @@ import typing
 import game_tokens
 import actors
 import abc
-import hands
+import hand_logic
 from game_states.betting import BettingActions
 import random
 
