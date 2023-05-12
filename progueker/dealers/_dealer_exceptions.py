@@ -1,0 +1,2 @@
+class DealerExceptions(Exception):
+    pass

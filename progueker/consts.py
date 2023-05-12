@@ -1,7 +1,7 @@
-from progueker.utils import EnumDict
+import enum
 
 
-class Colors(EnumDict):
+class Colors(enum.StrEnum):
     RED = "Red"
     ORANGE = "Orange"
     YELLOW = "Yellow"
